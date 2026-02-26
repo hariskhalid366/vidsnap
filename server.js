@@ -20,7 +20,21 @@ const execFileAsync = promisify(execFile)
 const app = express()
 const PORT = process.env.PORT || 3001
 
-const BIN_DIR = path.join(process.cwd(), 'bin')
+// Cloud-ready binary paths (uses /tmp if the root is read-only)
+const getBinDir = () => {
+  const localBin = path.join(process.cwd(), 'bin')
+  try {
+    if (!fs.existsSync(localBin)) fs.mkdirSync(localBin)
+    fs.accessSync(localBin, fs.constants.W_OK)
+    return localBin
+  } catch {
+    const tmpBin = path.join(os.tmpdir(), 'vidsnap-bin')
+    if (!fs.existsSync(tmpBin)) fs.mkdirSync(tmpBin)
+    return tmpBin
+  }
+}
+
+const BIN_DIR = getBinDir()
 const DIST_PATH = path.join(__dirname, 'dist')
 const YTDLP_PATH = path.join(BIN_DIR, os.platform() === 'win32' ? 'yt-dlp.exe' : 'yt-dlp')
 
