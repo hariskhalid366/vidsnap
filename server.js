@@ -13,12 +13,15 @@ import os from 'os'
 import fs from 'fs'
 import https from 'https'
 import ffmpegPath from 'ffmpeg-static'
+import { fileURLToPath } from 'url'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const execFileAsync = promisify(execFile)
 const app = express()
 const PORT = process.env.PORT || 3001
 
 const BIN_DIR = path.join(process.cwd(), 'bin')
+const DIST_PATH = path.join(__dirname, 'dist')
 const YTDLP_PATH = path.join(BIN_DIR, os.platform() === 'win32' ? 'yt-dlp.exe' : 'yt-dlp')
 
 /* ── Bootstrap Engine ────────────────────────────────────── */
@@ -239,6 +242,18 @@ app.get('/api/download', async (req, res) => {
     res.status(500).send('Engine error')
   }
 })
+
+/* ── Static Files (Frontend) ───────────────────────────── */
+// If dist exists (after npm run build), serve it
+if (fs.existsSync(DIST_PATH)) {
+  app.use(express.static(DIST_PATH))
+  
+  // React Router fallback (must be last)
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next()
+    res.sendFile(path.join(DIST_PATH, 'index.html'))
+  })
+}
 
 app.listen(PORT, () => {
   console.log(`\n✅ VidSnap Portable backend ready → http://localhost:${PORT}`)

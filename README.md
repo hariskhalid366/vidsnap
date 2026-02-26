@@ -1,71 +1,48 @@
 # VidSnap – Universal Video Downloader ⚡
 
-VidSnap is a high-performance, free, and open-source video downloader built with React and Node.js. It features a **self-bootstrapping portable engine** that supports video and audio extraction from over 1,100 platforms including YouTube, TikTok, Facebook, Instagram, and more.
+VidSnap is a high-performance, free, and open-source video downloader built with React and Node.js. It features a **self-bootstrapping portable engine** and a **monolithic architecture** for easy deployment.
 
 ## 🚀 Features
 
-- **Portable Engine**: Automatically downloads its own binaries. No manual setup of `yt-dlp` or `FFmpeg` is required on the server.
-- **4K & HDR Support**: Download videos in the highest quality available, up to 4K at 60fps.
+- **One-Click Deployment**: The backend now serves the frontend automatically.
+- **Portable Engine**: Automatically downloads its own `yt-dlp` binaries.
+- **4K & HDR Support**: High-quality downloads up to 4K at 60fps.
 - **High-Fidelity Audio**: Professional MP3 extraction (up to 320kbps).
-- **Clean Downloads**: No watermarks for TikTok and Instagram Reels.
-- **1,100+ Sites**: Universal support powered by the industry-standard engine.
+- **1,100+ Sites**: Universal support powered by `yt-dlp` and `ffmpeg-static`.
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React, Vite, Vanilla CSS.
+- **Frontend**: React, Vite (compiled into `/dist`).
 - **Backend**: Node.js, Express.
 - **Engine**: Self-managed `yt-dlp` & `ffmpeg-static`.
 
-## 📦 Professional Deployment-Ready Architecture
+## 📦 Deployment Structure (Monolithic)
 
-Unlike standard downloaders that require manual system configuration, **VidSnap is fully hostable**:
+I have optimized the project so that **you only need to deploy one thing**:
 
-- **Auto-Bootstrapping**: On the first run, the server automatically downloads the correct `yt-dlp` binary for its environment.
-- **Static FFmpeg**: Uses `ffmpeg-static` via NPM for seamless high-quality merging.
-- **Zero Global Dependencies**: Host on Render, Railway, Vercel, or any VPS without installing a single system package.
+1.  **Build the Frontend**: Run `npm run build`. This creates a `dist/` folder.
+2.  **Deploy the Folder**: Push your code to GitHub and connect it to a Node.js host.
+3.  **Automatic Serving**: The `server.js` will detect the `dist/` folder and serve the website and the API from the same URL.
 
-## 🛠️ Local Installation
+## ☁️ How to Deploy (Step-by-Step)
 
-1. **Clone the repository**:
+### Option 1: Render.com (Recommended)
 
-   ```bash
-   git clone <your-repo-url>
-   cd vidsnap
-   ```
+1.  **Build Command**: `npm run build`
+2.  **Start Command**: `npm start`
+3.  **Service Type**: Web Service
 
-2. **Install dependencies**:
+### Option 2: VPS (DigitalOcean/Linode)
 
-   ```bash
-   npm install
-   ```
+1.  Connect to your VPS and clone the repo.
+2.  Run `npm install` and `npm run build`.
+3.  Start with PM2: `pm2 start server.js --name vidsnap`.
 
-3. **Start the development servers**:
-   ```bash
-   npm run dev    # Starts frontend on http://localhost:5173
-   npm run server # Starts portable engine on http://localhost:3001
-   ```
+## 🛠️ Local Development
 
-## ☁️ Deployment Instructions
-
-### Backend (Engine)
-
-Host the Node.js backend on a platform that supports persistent processes:
-
-- **Render / Railway / Fly.io**: Connect your GitHub and use `node server.js` as the start command.
-- **VPS (Ubuntu/Debian)**:
-  ```bash
-  pm2 start server.js --name vidsnap-api
-  ```
-
-### Frontend
-
-Deploy the Vite build to any static host (Vercel, Netlify, GitHub Pages):
-
-```bash
-npm run build
-```
-
-Ensure the API proxy or environment variables point to your live backend URL.
+1.  **Install**: `npm install`
+2.  **Frontend**: `npm run dev` (http://localhost:5173)
+3.  **Backend**: `npm run server` (http://localhost:3001)
 
 ## ⚖️ Legal Disclaimer
 
