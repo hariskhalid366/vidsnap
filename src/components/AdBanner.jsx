@@ -48,7 +48,7 @@ export default function AdBanner({ slot = "default", format = "horizontal" }) {
         data-full-width-responsive="true"
       /> */}
       <ins
-        class="adsbygoogle"
+        className="adsbygoogle"
         ref={ref}
         style={styles[format] || styles.horizontal}
         data-ad-client="ca-pub-9133057606079185"
