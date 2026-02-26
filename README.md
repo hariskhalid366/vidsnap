@@ -1,60 +1,71 @@
 # VidSnap – Universal Video Downloader ⚡
 
-VidSnap is a high-performance, free, and open-source video downloader built with React and Node.js. It leverages `yt-dlp` to support video and audio extraction from over 1,100 platforms including YouTube, TikTok, Facebook, Instagram, and more.
+VidSnap is a high-performance, free, and open-source video downloader built with React and Node.js. It features a **self-bootstrapping portable engine** that supports video and audio extraction from over 1,100 platforms including YouTube, TikTok, Facebook, Instagram, and more.
 
 ## 🚀 Features
 
+- **Portable Engine**: Automatically downloads its own binaries. No manual setup of `yt-dlp` or `FFmpeg` is required on the server.
 - **4K & HDR Support**: Download videos in the highest quality available, up to 4K at 60fps.
-- **Smart Merging**: Automatically merges high-res video streams with the best audio using FFmpeg.
-- **MP3 Extraction**: High-quality audio conversion (up to 320kbps).
-- **No Watermarks**: Clean downloads for TikTok, Instagram Reels, and more.
-- **1,100+ Sites**: Universal support powered by `yt-dlp`.
+- **High-Fidelity Audio**: Professional MP3 extraction (up to 320kbps).
+- **Clean Downloads**: No watermarks for TikTok and Instagram Reels.
+- **1,100+ Sites**: Universal support powered by the industry-standard engine.
 
 ## 🛠️ Technology Stack
 
 - **Frontend**: React, Vite, Vanilla CSS.
 - **Backend**: Node.js, Express.
-- **Engine**: `yt-dlp` & `FFmpeg`.
+- **Engine**: Self-managed `yt-dlp` & `ffmpeg-static`.
 
-## 📦 Local Installation
+## 📦 Professional Deployment-Ready Architecture
 
-### Prerequisites
+Unlike standard downloaders that require manual system configuration, **VidSnap is fully hostable**:
 
-1.  **Node.js**: Install the latest LTS version.
-2.  **yt-dlp**: Must be installed and available in your PATH or fixed location.
-3.  **FFmpeg**: Required for merging high-quality video and audio.
+- **Auto-Bootstrapping**: On the first run, the server automatically downloads the correct `yt-dlp` binary for its environment.
+- **Static FFmpeg**: Uses `ffmpeg-static` via NPM for seamless high-quality merging.
+- **Zero Global Dependencies**: Host on Render, Railway, Vercel, or any VPS without installing a single system package.
 
-### Commands
+## 🛠️ Local Installation
 
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd resonant-disk
+1. **Clone the repository**:
 
-# Install dependencies
-npm install
+   ```bash
+   git clone <your-repo-url>
+   cd vidsnap
+   ```
 
-# Start the backend server (Port 3001)
-npm run server
+2. **Install dependencies**:
 
-# In a new terminal, start the frontend (Port 5173)
-npm run dev
-```
+   ```bash
+   npm install
+   ```
 
-## 🌐 Deployment Instructions
+3. **Start the development servers**:
+   ```bash
+   npm run dev    # Starts frontend on http://localhost:5173
+   npm run server # Starts portable engine on http://localhost:3001
+   ```
 
-### Backend (Essential)
+## ☁️ Deployment Instructions
 
-Because this app runs `yt-dlp` and `ffmpeg` as system processes, it requires a **Node.js hosting provider with a filesystem**.
+### Backend (Engine)
 
-- **Recommended**: [Render.com](https://render.com/), [Railway.app](https://railway.app/), or any VPS (DigitalOcean, Linode).
-- **Environment**: Ensure `yt-dlp` and `ffmpeg` are installed in the deployment environment's build step.
+Host the Node.js backend on a platform that supports persistent processes:
+
+- **Render / Railway / Fly.io**: Connect your GitHub and use `node server.js` as the start command.
+- **VPS (Ubuntu/Debian)**:
+  ```bash
+  pm2 start server.js --name vidsnap-api
+  ```
 
 ### Frontend
 
-The frontend can be built and hosted on **Vercel**, **Netlify**, or **GitHub Pages**.
+Deploy the Vite build to any static host (Vercel, Netlify, GitHub Pages):
 
-- Update the API proxy in `vite.config.js` or use environment variables to point to your live backend URL.
+```bash
+npm run build
+```
+
+Ensure the API proxy or environment variables point to your live backend URL.
 
 ## ⚖️ Legal Disclaimer
 
