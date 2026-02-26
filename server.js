@@ -119,6 +119,7 @@ function fmtViews(n) {
 /* ── GET /api/info?url=... ──────────────────────────────── */
 app.get('/api/info', async (req, res) => {
   const { url } = req.query
+  console.log(`\n🔍 [GET /api/info] Processing: ${url}`)
   if (!url) return res.status(400).json({ error: 'URL is required' })
 
   try {
@@ -211,6 +212,7 @@ app.get('/api/info', async (req, res) => {
 /* ── GET /api/download?url=...&formatId=... ──────────────── */
 app.get('/api/download', async (req, res) => {
   const { url, formatId, type, abr, title = 'video' } = req.query
+  console.log(`\n📥 [GET /api/download] formatId: ${formatId}, type: ${type}, url: ${url}`)
   if (!url || !formatId) return res.status(400).json({ error: 'url and formatId are required' })
 
   try {
