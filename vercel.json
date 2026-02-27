@@ -1,14 +1,16 @@
 {
-  "builds": [
-    {
-      "source": "./server.js",
-      "dest": "@vercel/node"
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": null,
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 60,
+      "memory": 1024
     }
-  ],
-  "routes":[
-    {
-      "source": "/(.*)",
-      "dest": "/server.js"
-    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
