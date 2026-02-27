@@ -215,14 +215,18 @@ app.get('/api/download', async (req, res) => {
   console.log(`\n📥 [GET /api/download] formatId: ${formatId}, type: ${type}, url: ${url}`)
   if (!url || !formatId) return res.status(400).json({ error: 'url and formatId are required' })
 
+  let tmpFile = null
+
   try {
     const ytdlp = await ensureYtdlp()
     const isAudio = type === 'audio'
     const safeTitle = title.replace(/[^a-z0-9_\-\s]/gi, '_').slice(0, 80)
     const ext = isAudio ? 'mp3' : 'mp4'
 
-    res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}.${ext}"`)
-    res.setHeader('Content-Type', isAudio ? 'audio/mpeg' : 'video/mp4')
+    // Write to a temp file first so we can send Content-Length.
+    // This is critical for Android Chrome and mobile browsers which need
+    // the file size to show a proper download progress bar.
+    tmpFile = path.join(os.tmpdir(), `vidsnap-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`)
 
     const args = isAudio
       ? [
@@ -231,31 +235,54 @@ app.get('/api/download', async (req, res) => {
           '--audio-quality', abr ? `${abr}K` : '192K',
           '--no-playlist', '--no-warnings',
           '--ffmpeg-location', ffmpegPath,
-          '-o', '-', url
+          '-o', tmpFile, url
         ]
       : [
           '-f', `(bv*)[format_id=${formatId}]+ba/b[format_id=${formatId}]/b`,
           '--merge-output-format', 'mp4',
           '--no-playlist', '--no-warnings',
           '--ffmpeg-location', ffmpegPath,
-          '-o', '-', url
+          '-o', tmpFile, url
         ]
 
     if (hasCookies()) args.push('--cookies', COOKIES_PATH)
 
-    const proc = spawn(ytdlp, args)
-    proc.stdout.pipe(res)
+    console.log(`   Buffering to temp file: ${tmpFile}`)
+    await execFileAsync(ytdlp, args, { timeout: 300000 }) // 5 min max
 
-    proc.on('error', (err) => {
-      console.error('Download error:', err)
-      if (!res.headersSent) res.status(500).json({ error: 'Download failed' })
+    const stat = fs.statSync(tmpFile)
+    console.log(`   ✅ Buffered ${(stat.size / 1e6).toFixed(1)} MB → streaming to client`)
+
+    res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}.${ext}"`)
+    res.setHeader('Content-Type', isAudio ? 'audio/mpeg' : 'video/mp4')
+    res.setHeader('Content-Length', stat.size)
+    // Allow range requests for better mobile video streaming support
+    res.setHeader('Accept-Ranges', 'bytes')
+
+    const readStream = fs.createReadStream(tmpFile)
+    readStream.pipe(res)
+
+    readStream.on('error', (err) => {
+      console.error('Stream error:', err)
+      if (!res.headersSent) res.status(500).json({ error: 'Stream failed' })
     })
 
-    req.on('close', () => proc.kill())
+    res.on('finish', () => {
+      // Clean up temp file after delivery
+      try { fs.unlinkSync(tmpFile) } catch { /* ignore */ }
+      tmpFile = null
+    })
+
+    req.on('close', () => {
+      if (tmpFile) {
+        try { fs.unlinkSync(tmpFile) } catch { /* ignore */ }
+      }
+    })
 
   } catch (err) {
     console.error('[/api/download] Fatal:', err)
-    res.status(500).send('Engine error')
+    if (tmpFile) { try { fs.unlinkSync(tmpFile) } catch { /* ignore */ } }
+    if (!res.headersSent) res.status(500).json({ error: 'Download failed. Check the URL and try again.' })
   }
 })
 
@@ -270,6 +297,11 @@ if (fs.existsSync(DIST_PATH)) {
     res.sendFile(path.join(DIST_PATH, 'index.html'))
   })
 }
+app.get("/",(req,res)=>{
+  res.send({
+    activeStatus:true,error:false
+  })
+})
 
 app.listen(PORT, () => {
   console.log(`\n✅ VidSnap Portable backend ready → http://localhost:${PORT}`)

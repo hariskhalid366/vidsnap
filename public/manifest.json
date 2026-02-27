@@ -1,0 +1,18 @@
+{
+  "name": "VidSnap",
+  "short_name": "VidSnap",
+  "description": "Download videos from YouTube, Facebook, Instagram & TikTok for free.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050510",
+  "theme_color": "#8b5cf6",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

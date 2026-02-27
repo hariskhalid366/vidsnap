@@ -1,32 +1,76 @@
 import { useState } from 'react'
 
+// Detect iOS so we can show a special notice
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
 export default function DownloadResult({ result }) {
   const [downloading, setDownloading] = useState(null)
   const [activeTab, setActiveTab] = useState('video')
 
   const handleDownload = (format) => {
     setDownloading(format.label)
-    
+
     const params = new URLSearchParams({
       url: result.url,
       formatId: format.formatId,
       type: format.type,
       title: result.title || 'video'
     })
-
     if (format.abr) params.append('abr', format.abr)
 
-    // Redirect to the download API which will stream the file
-    window.location.href = `/api/download?${params.toString()}`
-    
-    setTimeout(() => setDownloading(null), 2000)
+    const downloadUrl = `/api/download?${params.toString()}`
+
+    // On iOS Safari, downloads via JS anchor don't work natively.
+    // Open in a new tab so the user can "Share → Save to Files".
+    if (isIOS()) {
+      window.open(downloadUrl, '_blank', 'noopener')
+    } else {
+      // Use hidden anchor with `download` attribute for reliable downloads
+      // on Android Chrome and desktop browsers.
+      const a = document.createElement('a')
+      a.href = downloadUrl
+      a.download = (result.title || 'video').replace(/[^a-z0-9_\-\s]/gi, '_').slice(0, 80) +
+        (format.type === 'audio' ? '.mp3' : '.mp4')
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+
+    setTimeout(() => setDownloading(null), 3000)
   }
 
   const formats = result.formats || []
   const filtered = formats.filter(f => f.type === activeTab)
+  const ios = isIOS()
 
   return (
     <div className="result-card" style={{ marginTop: 32 }}>
+      {/* iOS notice banner */}
+      {ios && (
+        <div style={{
+          background: 'rgba(251, 191, 36, 0.1)',
+          border: '1px solid rgba(251, 191, 36, 0.3)',
+          borderRadius: 'var(--radius-md)',
+          padding: '10px 16px',
+          margin: '16px 16px 0',
+          fontSize: '0.82rem',
+          color: '#fbbf24',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+        }}>
+          <span style={{ flexShrink: 0 }}>ℹ️</span>
+          <span>
+            <strong>iOS tip:</strong> Tap a format to open it in a new tab, then tap the Share icon → <strong>Save to Files</strong> to download.
+            For better download support, try <strong>Chrome for iOS</strong>.
+          </span>
+        </div>
+      )}
+
       {/* Video info */}
       <div className="result-video-info">
         {result.thumbnail ? (

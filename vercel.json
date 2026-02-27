@@ -1,12 +1,14 @@
 {
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "https://vidsnap-seven.vercel.app/api/:path*"
-    },
+      "source": "./server.js",
+      "dest": "@vercel/node"
+    }
+  ],
+  "routes":[
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "dest": "/server.js"
     }
   ]
 }

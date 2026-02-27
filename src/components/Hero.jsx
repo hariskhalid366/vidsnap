@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import useVideoDownloader from '../hooks/useVideoDownloader'
 import DownloadResult from './DownloadResult'
-import AdBanner from './AdBanner'
 
 const PLACEHOLDER_EXAMPLES = [
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -24,13 +23,23 @@ export default function Hero() {
   }
 
   const handlePaste = async () => {
+    // Clipboard API requires HTTPS and a user gesture.
+    // On iOS Safari it may be blocked — fall back gracefully.
     try {
-      const text = await navigator.clipboard.readText()
-      setUrl(text)
-      if (text) download(text)
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText()
+        if (text) {
+          setUrl(text)
+          download(text)
+          return
+        }
+      }
     } catch {
-      inputRef.current?.focus()
+      // Permission denied or API unavailable (common on iOS)
     }
+    // Fallback: just focus the input so the user can paste manually
+    inputRef.current?.focus()
+    inputRef.current?.select()
   }
 
   return (
@@ -96,39 +105,34 @@ export default function Hero() {
         {/* Input box */}
         <form
           onSubmit={handleSubmit}
-          className="fade-in-4"
-          style={{
-            maxWidth: 720,
-            margin: '0 auto 32px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}
+          className="fade-in-4 hero-form"
         >
-          <div style={{ display: 'flex', gap: 10, position: 'relative' }}>
+          <div className="hero-input-row">
             <input
               ref={inputRef}
               type="url"
-              className="input-field"
+              inputMode="url"
+              className="input-field hero-input"
               placeholder={PLACEHOLDER_EXAMPLES[placeholderIdx]}
               value={url}
               onChange={(e) => { setUrl(e.target.value); if (result) reset() }}
-              style={{ borderRadius: '999px', paddingRight: '200px' }}
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck="false"
             />
-            <div style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 6 }}>
+            <div className="hero-btn-group">
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost hero-paste-btn"
                 onClick={handlePaste}
-                style={{ padding: '9px 16px', fontSize: '0.82rem' }}
               >
                 📋 Paste
               </button>
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn btn-primary hero-submit-btn"
                 disabled={loading}
-                style={{ padding: '9px 22px', fontSize: '0.88rem', minWidth: 96 }}
               >
                 {loading ? <span className="spinner" /> : '↓ Get Video'}
               </button>
@@ -148,7 +152,7 @@ export default function Hero() {
 
         {/* Supported platform icons */}
         {!result && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
             {[
               { name: 'YouTube', color: '#ff0000', icon: <YouTubeIcon /> },
               { name: 'Facebook', color: '#1877f2', icon: <FacebookIcon /> },
@@ -161,7 +165,7 @@ export default function Hero() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  padding: '8px 18px',
+                  padding: '8px 16px',
                   borderRadius: 999,
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
