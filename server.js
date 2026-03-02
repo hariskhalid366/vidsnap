@@ -50,7 +50,7 @@ async function ensureYtdlp() {
     ? 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe'
     : platform === 'darwin'
     ? 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos'
-    : 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp'
+    : 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux'
 
   const download = (url, dest) => {
     return new Promise((resolve, reject) => {
