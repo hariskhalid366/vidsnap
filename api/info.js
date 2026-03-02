@@ -156,6 +156,11 @@ export default async function handler(req, res) {
     })
   } catch (err) {
     console.error('[/api/info] Error:', err.message)
-    res.status(400).json({ error: 'Could not fetch video info. Check the URL and try again.' })
+    // Return the actual error message for debugging purposes on Vercel
+    res.status(400).json({ 
+      error: 'Could not fetch video info.',
+      details: err.message,
+      suggestion: 'If this is a "Sign in" error, the platform may be blocking Vercel server IPs.'
+    })
   }
 }

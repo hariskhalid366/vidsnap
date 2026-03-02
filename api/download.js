@@ -86,6 +86,10 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('[/api/download] Error:', err.message)
-    res.status(500).json({ error: 'Could not retrieve download URL. Try again.' })
+    res.status(500).json({ 
+      error: 'Could not retrieve download URL.',
+      details: err.message,
+      suggestion: 'This might happen if the platform blocks serverless IP addresses.'
+    })
   }
 }
