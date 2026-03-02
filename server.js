@@ -292,7 +292,7 @@ if (fs.existsSync(DIST_PATH)) {
   app.use(express.static(DIST_PATH))
   
   // React Router fallback (must be last)
-  app.get('*', (req, res, next) => {
+  app.get(/.*/, (req, res, next) => {
     if (req.path.startsWith('/api')) return next()
     res.sendFile(path.join(DIST_PATH, 'index.html'))
   })

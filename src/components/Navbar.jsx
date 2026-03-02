@@ -30,6 +30,10 @@ export default function Navbar() {
     }, menuOpen ? 300 : 0)
   }
 
+  const refreshPage = () => {
+    window.location.href = '/'
+  }
+
   const navItems = [
     { label: 'Platforms', id: 'platforms' },
     { label: 'Features', id: 'features' },
@@ -41,7 +45,7 @@ export default function Navbar() {
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-inner">
-          <div className="nav-logo">
+          <div className="nav-logo" onClick={refreshPage} style={{ cursor: 'pointer' }}>
             <span className="gradient-text">⚡ VidSnap</span>
           </div>
 
@@ -80,7 +84,7 @@ export default function Navbar() {
       {/* Mobile menu drawer */}
       <div className={`nav-mobile-menu ${menuOpen ? 'open' : ''}`}>
         <div className="nav-mobile-header">
-          <span className="gradient-text nav-logo">⚡ VidSnap</span>
+          <span className="gradient-text nav-logo" onClick={refreshPage} style={{ cursor: 'pointer' }}>⚡ VidSnap</span>
           <button className="nav-mobile-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">✕</button>
         </div>
         <div className="nav-mobile-links">

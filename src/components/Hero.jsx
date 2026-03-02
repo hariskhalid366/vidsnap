@@ -125,7 +125,10 @@ export default function Hero() {
               <button
                 type="button"
                 className="btn btn-ghost hero-paste-btn"
-                onClick={handlePaste}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handlePaste();
+                }}
               >
                 📋 Paste
               </button>
@@ -139,7 +142,7 @@ export default function Hero() {
             </div>
           </div>
           {error && (
-            <div style={{ textAlign: 'center', marginTop: 8 }}>
+            <div className="fade-in" style={{ textAlign: 'center', marginTop: 12 }}>
               <p style={{ color: '#f87171', fontSize: '0.88rem' }}>
                 ⚠️ {error}
               </p>

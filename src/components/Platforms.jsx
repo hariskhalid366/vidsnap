@@ -108,17 +108,10 @@ export default function Platforms() {
         {/* Active platform detail card */}
         <div
           key={p.id}
+          className="platform-detail-card"
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 40,
-            alignItems: 'center',
-            background: 'var(--bg-card)',
-            borderRadius: 'var(--radius-xl)',
-            padding: '48px',
             border: `1px solid ${p.color}33`,
             boxShadow: `0 8px 48px ${p.shadow}`,
-            animation: 'fadeInUp 0.3s ease',
           }}
         >
           <div>
@@ -161,15 +154,8 @@ export default function Platforms() {
           </div>
 
           {/* Mock download preview */}
-          <div
-            style={{
-              background: 'var(--bg-secondary)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 24,
-              border: '1px solid var(--border)',
-            }}
-          >
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div className="mock-preview"> 
+             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Try it now
             </div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -185,10 +171,11 @@ export default function Platforms() {
                   fontSize: '0.8rem',
                   fontFamily: 'monospace',
                   cursor: 'default',
+                  minWidth: 0, /* essential for input flex children overflow */
                 }}
               />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            </div> 
+             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {['4K Ultra HD · MP4', '1080p Full HD · MP4', '720p HD · MP4', 'MP3 Audio · 320kbps'].map((fmt, i) => (
                 <div
                   key={fmt}
@@ -205,11 +192,11 @@ export default function Platforms() {
                     fontWeight: i === 0 ? 600 : 400,
                   }}
                 >
-                  {fmt}
-                  <span style={{ fontSize: '1rem' }}>⬇</span>
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginRight: 8 }}>{fmt}</span>
+                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>⬇</span>
                 </div>
               ))}
-            </div>
+            </div> 
           </div>
         </div>
       </div>

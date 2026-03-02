@@ -23,21 +23,25 @@ export default function DownloadResult({ result }) {
 
     const downloadUrl = `/api/download?${params.toString()}`
 
-    // On iOS Safari, downloads via JS anchor don't work natively.
-    // Open in a new tab so the user can "Share → Save to Files".
     if (isIOS()) {
       window.open(downloadUrl, '_blank', 'noopener')
     } else {
-      // Use hidden anchor with `download` attribute for reliable downloads
-      // on Android Chrome and desktop browsers.
       const a = document.createElement('a')
       a.href = downloadUrl
-      a.download = (result.title || 'video').replace(/[^a-z0-9_\-\s]/gi, '_').slice(0, 80) +
+      const filename = (result.title || 'video').replace(/[^a-z0-9_\-\s]/gi, '_').slice(0, 80) +
         (format.type === 'audio' ? '.mp3' : '.mp4')
+      a.download = filename
       a.style.display = 'none'
       document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      
+      // Delay click slightly to ensure state has settled
+      requestAnimationFrame(() => {
+        a.click()
+        // Keep it in DOM for a moment for mobile browser download managers
+        setTimeout(() => {
+          if (document.body.contains(a)) document.body.removeChild(a)
+        }, 150)
+      })
     }
 
     setTimeout(() => setDownloading(null), 3000)
