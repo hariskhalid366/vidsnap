@@ -38,7 +38,7 @@ const downloadBin = (url, dest) => new Promise((resolve, reject) => {
 
 async function ensureYtdlp() {
   if (fs.existsSync(YTDLP_PATH) && fs.statSync(YTDLP_PATH).size > 1000) return YTDLP_PATH
-  const releaseUrl = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp'
+  const releaseUrl = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux'
   await downloadBin(releaseUrl, YTDLP_PATH)
   fs.chmodSync(YTDLP_PATH, 0o755)
   return YTDLP_PATH
